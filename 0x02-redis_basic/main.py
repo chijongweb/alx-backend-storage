@@ -4,7 +4,7 @@ Main file to test the Cache class with all implemented tasks.
 """
 
 import redis
-from exercise import Cache
+from exercise import Cache, replay
 
 cache = Cache()
 
@@ -57,3 +57,7 @@ outputs = cache._redis.lrange(f"{cache.store.__qualname__}:outputs", 0, -1)
 
 print(f"inputs: {inputs}")
 print(f"outputs: {outputs}")
+
+# Task 5: Test replay function
+print("\n=== Task 5: replay function output ===")
+replay(cache.store)
