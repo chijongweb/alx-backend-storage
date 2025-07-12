@@ -8,9 +8,32 @@ from exercise import Cache
 
 cache = Cache()
 
+# Task 0: Store binary data
 data = b"hello"
 key = cache.store(data)
-print(key)
-
+print(f"Stored key: {key}")
 local_redis = redis.Redis()
-print(local_redis.get(key))
+print(f"Raw Redis get: {local_redis.get(key)}")  # Expected: b'hello'
+
+# Task 1: Retrieve original types
+print("\n=== Task 1 Test Cases ===")
+TEST_CASES = {
+    b"foo": None,
+    123: int,
+    "bar": lambda d: d.decode("utf-8")
+}
+
+for value, fn in TEST_CASES.items():
+    key = cache.store(value)
+    result = cache.get(key, fn=fn)
+    print(f"Original: {value} | Retrieved: {result} | Match: {result == value}")
+    assert result == value
+
+
+print("\nTesting get_str and get_int methods:")
+
+key_str = cache.store("This is a string")
+print(f"get_str: {cache.get_str(key_str)}") 
+
+key_int = cache.store(42)
+print(f"get_int: {cache.get_int(key_int)}")  
