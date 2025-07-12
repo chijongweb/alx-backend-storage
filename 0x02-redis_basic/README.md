@@ -225,3 +225,57 @@ Provides clear visibility into method usage and history.
 Useful for debugging and auditing cached operations.
 
 Demonstrates combining decorators with Redis to track call metadata.
+
+
+# Task 5: Implementing an Expiring Web Cache and Tracker
+
+## Description
+
+This task demonstrates how to implement a caching system for web pages using **Redis** in Python. The solution includes:
+
+- Tracking the number of times a given URL is accessed using the Redis key `count:{url}`
+- Caching the content of a requested URL for **10 seconds** using Redis
+- Utilizing decorators to separate concerns (tracking vs. caching)
+
+This helps avoid repeated HTTP requests for the same URL within a short time frame, reducing latency and bandwidth usage.
+
+---
+
+## File
+
+- `web.py`
+
+---
+
+## Key Components
+
+### `get_page(url: str) -> str`
+
+Fetches the HTML content of a given URL using the `requests` module, with the following behaviors:
+- Tracks the number of accesses using `count:{url}` in Redis
+- Caches the HTML content in Redis for 10 seconds
+
+### Decorators
+
+- `@count_url_access`: Increments the access count for a given URL
+- `@cache_page(expiration=10)`: Caches the page content with a TTL of 10 seconds
+
+---
+
+## How to Test
+
+Use the built-in test script inside `web.py`:
+
+```bash
+python web.py
+
+output:
+
+First request (slow, not cached):
+<html>...</html>
+
+Second request (should be cached):
+<html>...</html>
+
+Access count:
+b'2'
