@@ -142,3 +142,35 @@ outputs = cache._redis.lrange("Cache.store:outputs", 0, -1)
 
 print(inputs)  # [b"('data1',)", b"('data2',)"]
 print(outputs) # [b"<key1>", b"<key2>"]
+
+## Task 4: Storing call history with Redis lists
+
+In this task, we enhanced the `Cache` class by implementing a `call_history` decorator.
+
+### What it does
+
+- Every time the decorated method (e.g., `Cache.store`) is called, the input arguments are serialized and appended to a Redis list with key `<method_name>:inputs`.
+- The output returned by the method is serialized and appended to another Redis list with key `<method_name>:outputs`.
+- This enables tracking the full history of inputs and outputs for method calls.
+
+### Implementation details
+
+- The decorator uses Redis' `RPUSH` command to append entries to lists.
+- Inputs are stored as strings representing the arguments tuple.
+- Outputs are stored as strings representing the return value.
+- Only positional arguments are considered for simplicity; keyword arguments are ignored.
+- This is useful for debugging, auditing, and replaying method calls.
+
+### Usage example
+
+```python
+cache = Cache()
+
+cache.store("first")
+cache.store("second")
+
+inputs = cache._redis.lrange("Cache.store:inputs", 0, -1)
+outputs = cache._redis.lrange("Cache.store:outputs", 0, -1)
+
+print(inputs)   # [b"('first',)", b"('second',)"]
+print(outputs)  # [b'<uuid1>', b'<uuid2>']
