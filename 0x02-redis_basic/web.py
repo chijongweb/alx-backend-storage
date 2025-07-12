@@ -7,7 +7,7 @@ import redis
 import requests
 from functools import wraps
 
-# Initialize a single Redis client to be reused
+# Single Redis client instance reused throughout
 redis_client = redis.Redis()
 
 
@@ -25,8 +25,8 @@ def count_url_access(method):
 
 def cache_page(expiration: int = 10):
     """
-    Decorator to cache page content in Redis with a specified expiration time.
-    Stores the cached content under key "cache:{url}".
+    Decorator to cache page content in Redis with expiration time.
+    Stores cached content under key "cache:{url}".
     """
     def decorator(method):
         @wraps(method)
@@ -48,14 +48,12 @@ def cache_page(expiration: int = 10):
 def get_page(url: str) -> str:
     """
     Fetch HTML content of a URL using requests.
-    Caches the response and tracks how many times the URL was accessed.
     """
     response = requests.get(url)
     response.raise_for_status()
     return response.text
 
 
-# Optional: Only runs when executing this script directly
 if __name__ == "__main__":
     test_url = "http://slowwly.robertomurray.co.uk/delay/5000/url/http://example.com"
 
@@ -66,4 +64,8 @@ if __name__ == "__main__":
     print(get_page(test_url)[:100])
 
     print("\nAccess count:")
-    print(redis_client.get(f"count:{test_url}").decode('utf-8'))
+    count = redis_client.get(f"count:{test_url}")
+    if count:
+        print(count.decode("utf-8"))
+    else:
+        print("0")
