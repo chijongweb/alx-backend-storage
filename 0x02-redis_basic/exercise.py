@@ -1,25 +1,36 @@
 #!/usr/bin/env python3
 """
-This module contains the Cache class for storing data in Redis.
+This module contains the Cache class for storing and retrieving data in Redis.
 """
 
 import redis
 import uuid
 from typing import Union, Optional, Callable
 
+
 class Cache:
     """A simple Redis cache"""
+
     def __init__(self):
+        """Initialize Redis client and flush existing data"""
         self._redis = redis.Redis()
         self._redis.flushdb()
 
     def store(self, data: Union[str, bytes, int, float]) -> str:
-        """Stores the given data in Redis using a random key"""
+        """
+        Stores the given data in Redis using a randomly generated key.
+
+        Args:
+            data: The data to store (can be str, bytes, int, or float)
+
+        Returns:
+            str: The Redis key used to store the data
+        """
         key = str(uuid.uuid4())
         self._redis.set(key, data)
         return key
 
-def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, float, None]:
+    def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, float, None]:
         """
         Retrieve data from Redis by key and optionally apply a conversion function.
 
@@ -35,7 +46,7 @@ def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int,
             return None
         return fn(value) if fn else value
 
-def get_str(self, key: str) -> Optional[str]:
+    def get_str(self, key: str) -> Optional[str]:
         """
         Retrieve a UTF-8 decoded string from Redis.
 
@@ -47,7 +58,7 @@ def get_str(self, key: str) -> Optional[str]:
         """
         return self.get(key, fn=lambda d: d.decode('utf-8'))
 
-def get_int(self, key: str) -> Optional[int]:
+    def get_int(self, key: str) -> Optional[int]:
         """
         Retrieve an integer from Redis.
 
