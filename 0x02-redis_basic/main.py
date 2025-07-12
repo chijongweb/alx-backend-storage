@@ -29,11 +29,22 @@ for value, fn in TEST_CASES.items():
     print(f"Original: {value} | Retrieved: {result} | Match: {result == value}")
     assert result == value
 
-
 print("\nTesting get_str and get_int methods:")
 
 key_str = cache.store("This is a string")
-print(f"get_str: {cache.get_str(key_str)}") 
+print(f"get_str: {cache.get_str(key_str)}")
 
 key_int = cache.store(42)
-print(f"get_int: {cache.get_int(key_int)}")  
+print(f"get_int: {cache.get_int(key_int)}")
+
+# Task 3: Test count_calls decorator on store method
+print("\n=== Task 3: count_calls decorator test ===")
+
+cache.store(b"first")
+count = cache.get(cache.store.__qualname__)
+print(f"store called {count} time(s)")
+
+cache.store(b"second")
+cache.store(b"third")
+count = cache.get(cache.store.__qualname__)
+print(f"store called {count} time(s)")
