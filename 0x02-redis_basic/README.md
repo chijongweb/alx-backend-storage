@@ -104,3 +104,41 @@ Raw Redis get: b'hello'
 Original: b'foo' | Retrieved: b'foo' | Match: True
 Original: 123 | Retrieved: 123 | Match: True
 Original: bar | Retrieved: bar | Match: True
+
+
+# Task 2: Storing call history
+
+This task enhances the `Cache` class by adding a `call_history` decorator to track the inputs and outputs of method calls.
+
+## Objective
+
+- Create a decorator `call_history` that stores the history of inputs and outputs of a method in Redis.
+- Inputs are stored as strings in a Redis list with key format: `<method_name>:inputs`.
+- Outputs are stored as strings in a Redis list with key format: `<method_name>:outputs`.
+- Decorate the `Cache.store` method with this decorator.
+
+## Implementation Details
+
+- The decorator uses the Redis `RPUSH` command to append serialized inputs and outputs to their respective lists.
+- This allows reviewing the history of all calls made to the decorated method.
+- The original return value of the method is preserved and returned normally.
+
+## Usage
+
+When calling the `store` method of the `Cache` class, the following keys will be populated in Redis:
+
+- `Cache.store:inputs` — list of string representations of arguments passed.
+- `Cache.store:outputs` — list of string representations of the return values.
+
+## Example
+
+
+cache = Cache()
+cache.store("data1")
+cache.store("data2")
+
+inputs = cache._redis.lrange("Cache.store:inputs", 0, -1)
+outputs = cache._redis.lrange("Cache.store:outputs", 0, -1)
+
+print(inputs)  # [b"('data1',)", b"('data2',)"]
+print(outputs) # [b"<key1>", b"<key2>"]
