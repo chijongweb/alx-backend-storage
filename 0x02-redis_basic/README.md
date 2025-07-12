@@ -169,8 +169,55 @@ cache = Cache()
 cache.store("first")
 cache.store("second")
 
-inputs = cache._redis.lrange("Cache.store:inputs", 0, -1)
-outputs = cache._redis.lrange("Cache.store:outputs", 0, -1)
+inputs: [b"(b'hello',)", b"(b'foo',)", b'(123,)', b"('bar',)", b"('This is a string',)", b'(42,)', b"(b'first',)", b"(b'second',)", b"(b'third',)"]
+outputs: [b'26094386-dc5b-49d4-bc9c-a2d5b882efdf', b'c7cb1496-4daf-4cf0-96da-f208c56a5786', b'e561b2d7-56ce-40a3-8bcd-59b32e862392', b'c5cf3cc6-a784-415d-a617-46a5ce87fe58', b'5cb55ade-ea0a-4618-b905-b3b6061a5d4e', b'c60a24d2-16bb-48c7-a00d-c8cbbec59ee9', b'fa6af223-d8ad-4ae0-b83a-53921de7eb59', b'01b27d2e-f43c-49cd-9b09-6726d4d71582', b'c0fec980-8dd2-440e-9a3b-3d51d1833d2c']
 
-print(inputs)   # [b"('first',)", b"('second',)"]
-print(outputs)  # [b'<uuid1>', b'<uuid2>']
+
+
+## Task 5: Retrieving call history with the replay function
+
+This task introduces the `replay` function to display the full history of calls
+to a decorated method (such as `Cache.store`).
+
+### Purpose
+
+The `replay` function retrieves and prints:
+
+- How many times the method was called.
+- Each call’s input arguments.
+- Each call’s output (return value).
+
+This leverages the data stored in Redis lists by the `call_history` decorator and
+the call count from the `count_calls` decorator.
+
+### Implementation details
+
+- Uses Redis keys:
+  - `<method_name>:inputs` for input arguments.
+  - `<method_name>:outputs` for output results.
+  - `<method_name>` for call count.
+- Fetches and decodes all inputs and outputs.
+- Prints a summary showing each call in the format:
+
+Cache.store was called 3 times:
+Cache.store(('foo',)) -> 13bf32a9-a249-4664-95fc-b1062db2038f
+Cache.store(('bar',)) -> dcddd00c-4219-4dd7-8877-66afbe8e7df8
+Cache.store(*(42,)) -> 5e752f2b-ecd8-4925-a3ce-e2efdee08d20
+
+### Usage example
+
+from exercise import Cache, replay
+
+cache = Cache()
+cache.store("foo")
+cache.store("bar")
+cache.store(42)
+
+replay(cache.store)
+
+Benefits
+Provides clear visibility into method usage and history.
+
+Useful for debugging and auditing cached operations.
+
+Demonstrates combining decorators with Redis to track call metadata.
