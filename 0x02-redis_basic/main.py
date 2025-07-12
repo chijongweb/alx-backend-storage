@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Main file to test the Cache class
+Main file to test the Cache class with all implemented tasks.
 """
 
 import redis
@@ -48,3 +48,12 @@ cache.store(b"second")
 cache.store(b"third")
 count = cache.get(cache.store.__qualname__)
 print(f"store called {count} time(s)")
+
+# Task 4: Test call_history decorator inputs/outputs
+print("\n=== Task 4: call_history decorator test ===")
+
+inputs = cache._redis.lrange(f"{cache.store.__qualname__}:inputs", 0, -1)
+outputs = cache._redis.lrange(f"{cache.store.__qualname__}:outputs", 0, -1)
+
+print(f"inputs: {inputs}")
+print(f"outputs: {outputs}")
