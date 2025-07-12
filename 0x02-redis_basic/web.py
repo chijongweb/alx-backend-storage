@@ -7,6 +7,9 @@ import redis
 import requests
 from functools import wraps
 
+# Initialize a single Redis client to be reused
+redis_client = redis.Redis()
+
 
 def count_url_access(method):
     """
@@ -15,8 +18,7 @@ def count_url_access(method):
     """
     @wraps(method)
     def wrapper(url: str) -> str:
-        r = redis.Redis()
-        r.incr(f"count:{url}")
+        redis_client.incr(f"count:{url}")
         return method(url)
     return wrapper
 
@@ -29,14 +31,13 @@ def cache_page(expiration: int = 10):
     def decorator(method):
         @wraps(method)
         def wrapper(url: str) -> str:
-            r = redis.Redis()
             cache_key = f"cache:{url}"
-            cached_data = r.get(cache_key)
+            cached_data = redis_client.get(cache_key)
             if cached_data:
-                return cached_data.decode('utf-8')
+                return cached_data.decode("utf-8")
 
             page_content = method(url)
-            r.setex(cache_key, expiration, page_content)
+            redis_client.setex(cache_key, expiration, page_content)
             return page_content
         return wrapper
     return decorator
@@ -47,21 +48,22 @@ def cache_page(expiration: int = 10):
 def get_page(url: str) -> str:
     """
     Fetch HTML content of a URL using requests.
+    Caches the response and tracks how many times the URL was accessed.
     """
     response = requests.get(url)
     response.raise_for_status()
     return response.text
 
 
+# Optional: Only runs when executing this script directly
 if __name__ == "__main__":
-    r = redis.Redis()
     test_url = "http://slowwly.robertomurray.co.uk/delay/5000/url/http://example.com"
 
     print("First request (slow, not cached):")
-    print(get_page(test_url)[:100])  # Print first 100 chars
+    print(get_page(test_url)[:100])  # Print first 100 characters
 
     print("\nSecond request (should be cached):")
     print(get_page(test_url)[:100])
 
     print("\nAccess count:")
-    print(r.get(f"count:{test_url}"))
+    print(redis_client.get(f"count:{test_url}").decode('utf-8'))
