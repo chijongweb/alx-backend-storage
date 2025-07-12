@@ -206,14 +206,18 @@ Cache.store(*(42,)) -> 5e752f2b-ecd8-4925-a3ce-e2efdee08d20
 
 ### Usage example
 
-from exercise import Cache, replay
+=== Task 5: replay function output ===
+Cache.store was called 9 times:
+Cache.store(*(b'hello',)) -> 26094386-dc5b-49d4-bc9c-a2d5b882efdf
+Cache.store(*(b'foo',)) -> c7cb1496-4daf-4cf0-96da-f208c56a5786
+Cache.store(*(123,)) -> e561b2d7-56ce-40a3-8bcd-59b32e862392
+Cache.store(*('bar',)) -> c5cf3cc6-a784-415d-a617-46a5ce87fe58
+Cache.store(*('This is a string',)) -> 5cb55ade-ea0a-4618-b905-b3b6061a5d4e
+Cache.store(*(42,)) -> c60a24d2-16bb-48c7-a00d-c8cbbec59ee9
+Cache.store(*(b'first',)) -> fa6af223-d8ad-4ae0-b83a-53921de7eb59
+Cache.store(*(b'second',)) -> 01b27d2e-f43c-49cd-9b09-6726d4d71582
+Cache.store(*(b'third',)) -> c0fec980-8dd2-440e-9a3b-3d51d1833d2c
 
-cache = Cache()
-cache.store("foo")
-cache.store("bar")
-cache.store(42)
-
-replay(cache.store)
 
 Benefits
 Provides clear visibility into method usage and history.
